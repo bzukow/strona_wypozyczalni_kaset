@@ -1,0 +1,60 @@
+@font-face {
+    font-family: "my_font2";
+    src: url("fonts/selawik.semilight.ttf") format("truetype");
+}
+
+body {
+    background-color: rgb(39, 39, 39);
+    font-family: "my_font2";
+    color: rgb(255, 82, 59);
+}
+
+input {
+    box-shadow:inset 0px 39px 0px -24px #ff9f68;
+    border: 0px;
+    border-color: #ffcaab;
+	background-color:#fd8252;
+	display:inline-block;
+	cursor:pointer;
+	color:#585858;
+	font-family:"my_font2";
+	font-size:15px;
+    padding:6px 15px;
+    margin: 3px;
+    text-shadow:0px 1px 0px #e25441;
+}
+input:hover {
+	background-color:#eb7a5e;
+}
+input:active {
+	position:relative;
+	top:1px;
+}
+
+#mainTitle{
+    font-size: 32px;
+    color: rgb(49, 49, 49);
+    background-color: #e26141;
+}
+
+table{
+    margin-left: 5%;
+    margin-right: 5%;
+    padding: 8px;
+}
+
+#makeColor td {
+    color: rgb(49, 49, 49);
+    background-color: coral;
+}
+
+td {
+    height: 30px;
+    padding: 10px;
+}
+form {
+    text-align: left;
+}
+#oneDifferent{
+    float: right;
+}

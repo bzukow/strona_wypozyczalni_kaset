@@ -1,0 +1,80 @@
+@font-face {
+    font-family: "my_font2";
+    src: url("fonts/selawik.semilight.ttf") format("truetype");
+}
+
+body {
+    background-color: rgb(39, 39, 39);
+    font-family: "my_font2";
+    color: rgb(255, 82, 59);
+}
+input:hover {
+	background-color:#eb7a5e;
+}
+
+.main{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 0.5fr 2fr 0.5fr;
+    grid-template-areas: "naglowek naglowek" "forLabels forInputs" "forButtons forButtons";
+    margin-top: 10%;
+    margin-left: 30%;
+    margin-right: 30%;
+    padding: 40px;
+    border: 1px solid #ffcaab;
+    background-color: #424242;
+    height: 360px;
+}
+.forLabels{
+    grid-area: forLabels;
+    margin-top: 20%;
+    margin-bottom: 10%;
+}
+.forLabels label{
+    display: inline-block;
+    padding: 3.5px;
+}
+.forInputs{
+    grid-area: forInputs; 
+    text-align: right;
+    margin-top: 20%;
+    margin-bottom: 10%;
+}
+.forInputs input, select { 
+    text-align: right;
+    width: 170px; 
+    box-shadow:inset 0px 39px 0px -24px #ffaf80;
+	background-color:#fd8252;
+	cursor:pointer;
+	color:#585858;
+    font-family:"my_font2";
+    margin: 4px;
+    margin-top: 0px;
+	font-size:15px;
+    text-shadow:0px 1px 0px #e25441;
+}
+.forButtons{
+    grid-area: forButtons;
+    text-align: center;
+}
+
+.forButtons input {
+    box-shadow:inset 0px 39px 0px -24px #ff9f68;
+    border: 0px;
+    border-color: #ffcaab;
+	background-color:#fd8252;
+	display:inline-block;
+	cursor:pointer;
+	color:#585858;
+	font-family:"my_font2";
+	font-size:15px;
+    padding:6px 15px;
+    margin: 6px;
+    text-shadow:0px 1px 0px #e25441;
+}
+
+.naglowek{
+    grid-area: naglowek;
+    text-align: center;
+    font-size: 30px;
+}

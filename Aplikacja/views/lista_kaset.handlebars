@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Lista kaset</title>
+    <link rel='stylesheet' type='text/css' href='/stylesheets/main.css' />
+</head>
+
+<body>
+    <script>
+        function usun(numer){
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    var data = JSON.parse(xmlhttp.responseText).validate;
+                    if(data){
+                        document.location.reload();
+                    } else {
+                        alert("Nie można usunąć kasety, które jest w tym czasie wypożyczona!");
+                    }
+                }
+            }
+            xmlhttp.open("POST", "//localhost:5000/usun_kasete", false);
+            xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xmlhttp.send(JSON.stringify({
+                ID: numer
+            }));
+        }
+        var tabelaDoEdycji;
+        var numerG;
+        function edit(numer) {
+            numerG = numer;
+            tabelaDoEdycji = document.getElementsByName(numer+numer);
+            for(var i = 1 ; i < tabelaDoEdycji.length ; i++){
+                tabelaDoEdycji[i].setAttribute("contenteditable", "true");
+                if(tabelaDoEdycji[i].id=="makeColor"){
+                    tabelaDoEdycji[i].style.backgroundColor = "#ff523b";
+                }else {
+                    tabelaDoEdycji[i].style.backgroundColor = "#ff523b";
+                    tabelaDoEdycji[i].style.color = "#585858";
+                }
+            }
+            
+            var buttons = document.getElementsByName("buttons"+numer);
+            for(var i = 0 ; i < buttons.length ; i++){
+                buttons[i].setAttribute("style", "display: none");
+            }
+            var buttonyWEdicie = document.getElementsByName("button"+numer+numer+numer);
+            for(var i = 0 ; i < buttonyWEdicie.length ; i++){
+                buttonyWEdicie[i].setAttribute("style", "display: inline-block");
+            }
+        }
+
+        function OK(){
+            if(/^[1-2][0-9]{3}\-[0][1-9]\-[0-2][0-9]$/g.test(tabelaDoEdycji[1].textContent) 
+            || /^[1-2][0-9]{3}\-[0][1-9]\-[3][0-1]$/g.test(tabelaDoEdycji[1].textContent)
+            || /^[1-2][0-9]{3}\-[1][0-2]\-[0-2][0-9]$/g.test(tabelaDoEdycji[1].textContent)
+            || /^[1-2][0-9]{3}\-[1][0-2]\-[3][0-1]$/g.test(tabelaDoEdycji[1].textContent)){
+                var dataProdukcji = new Date(tabelaDoEdycji[1].textContent);
+                var dzisiaj = new Date();
+                if(dataProdukcji < dzisiaj){
+                    if(/^[0-9]{6}$/g.test(tabelaDoEdycji[2].textContent)){
+                        if(/^[A-Za-z0-9]+[A-Za-z0-9\s]*$/g.test(tabelaDoEdycji[3].textContent)){
+                            if(tabelaDoEdycji[4].textContent == "Horror" || 
+                            tabelaDoEdycji[4].textContent == "Dokumentalny" ||
+                            tabelaDoEdycji[4].textContent == "Obyczajowy" ||
+                            tabelaDoEdycji[4].textContent == "Historyczny" ||
+                            tabelaDoEdycji[4].textContent == "Komediowy"){
+                                if(/^[A-Za-z0-9\s]*$/g.test(tabelaDoEdycji[5].textContent)){
+                                    var xmlhttp = new XMLHttpRequest();
+                                    xmlhttp.onreadystatechange = function () {
+                                        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                                            var valid = JSON.parse(xmlhttp.responseText).valid;
+                                            if(valid){
+                                                document.location.reload();
+                                            } else {
+                                                document.location.reload();
+                                                alert("Błąd przy zapisie do bazy danych");
+                                            }
+                                        }
+                                    }
+                                    xmlhttp.open("POST", "//localhost:5000/edytuj_kasete", false);
+                                    xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                                    xmlhttp.send(JSON.stringify({
+                                        ID: tabelaDoEdycji[0].textContent,
+                                        dataProdukcji: tabelaDoEdycji[1].textContent,
+                                        numerSeryjny: tabelaDoEdycji[2].textContent,  
+                                        tytul: tabelaDoEdycji[3].textContent,
+                                        typ: tabelaDoEdycji[4].textContent,
+                                        rezyser: tabelaDoEdycji[5].textContent
+                                    }));
+                                } else{
+                                    alert("Jeśli nie podajesz reżysera usuń wszystie znaki z pola!");
+                                    tabelaDoEdycji[5].setAttribute("style", "borderColor: red");
+                                }
+                            } else {
+                                alert("Podaj poprawny typ: Horror, Dokumentalny, Komediowy, Historyczny, Obyczajowy");
+                                tabelaDoEdycji[4].setAttribute("style", "borderColor: red");
+                            } 
+                        }else {
+                            alert("Podaj poprawny tytuł!");
+                            tabelaDoEdycji[3].setAttribute("style", "borderColor: red");
+                        }
+                    }else {
+                        alert("Podaj poprawny numer seryjny (6 cyfr)!");
+                        tabelaDoEdycji[2].setAttribute("style", "borderColor: red");
+                    }
+                } else {
+                    alert("Sprawdź datę produkcji - nie może wykraczać poza dzisiejszą!")
+                    tabelaDoEdycji[1].setAttribute("style", "borderColor: red");
+                }
+            } else {
+                alert("Podaj poprawną datę w formacie YYYY-MM-DD");
+                tabelaDoEdycji[1].setAttribute("style", "borderColor: red");
+            }
+        }
+    </script>
+    
+    <form>
+        <input type="submit" value="Lista klient&oacute;w" formaction="/lista_klientow" />
+        <input type="submit" value="Lista wypozyczeń" formaction="/lista_wypozyczen">
+        <input type="submit" id ="oneDifferent" value="Dodaj kasetę" formaction="/dodaj_kasete">
+    </form>
+    <table id="table_with_information" >
+        <tbody>
+            <tr style="height: 67.6px;">
+                <th  id="mainTitle" style="text-align: center;" colspan="7">Lista kaset</th>
+            </tr>
+            <tr style="height: 60px;">
+                <th style="width: 180px; height: 60px;">ID Kasety</th>
+                <th style="width: 180px; height: 60px;">Data produkcji</th>
+                <th style="width: 180px; height: 60px;">Numer seryjny</th>
+                <th style="width: 180px; height: 60px;">Tytuł</th>
+                <th style="width: 180px; height: 60px;">Typ</th>
+                <th style="width: 180px; height: 60px;">Reżyser</th>
+                <th style="width: 180px; height: 60px;"></th>
+                {{#list data.length}}
+                    {{this}}
+                {{/list}}
+            </tr>
+        </tbody>
+    </table>
+</body>
+
+</html>

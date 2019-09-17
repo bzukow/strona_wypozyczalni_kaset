@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Lista wypożyczeń</title>
+
+    <link rel='stylesheet' type='text/css' href='/stylesheets/main.css' />
+</head>
+<script>
+        function usun(numer){
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    var data = JSON.parse(xmlhttp.responseText).validate;
+                    if(data){
+                        document.location.reload();
+                    } else {
+                        alert("Nie można usunąć wypożyczenia w momencie, kiedy kaseta nie została jeszcze zwrócona!")
+                    }
+                }
+            }
+            xmlhttp.open("POST", "//localhost:5000/usun_wypozyczenie", false);
+            xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xmlhttp.send(JSON.stringify({
+                ID: numer
+            }));
+        }
+        var tabelaDoEdycji;
+        var numerG;
+        function edit(numer) {
+            numerG = numer;
+            tabelaDoEdycji = document.getElementsByName(numer+numer);
+            tabelaDoEdycji[7].setAttribute("contenteditable", "true");
+            if(tabelaDoEdycji[7].id=="makeColor"){
+                tabelaDoEdycji[7].style.backgroundColor = "#ff523b";
+            }else {
+                tabelaDoEdycji[7].style.backgroundColor = "#ff523b";
+                tabelaDoEdycji[7].style.color = "#585858";
+            }
+            var buttons = document.getElementsByName("buttons"+numer);
+            for(var i = 0 ; i < buttons.length ; i++){
+                buttons[i].setAttribute("style", "display: none");
+            }
+            var buttonyWEdicie = document.getElementsByName("button"+numer+numer+numer);
+            for(var i = 0 ; i < buttonyWEdicie.length ; i++){
+                buttonyWEdicie[i].setAttribute("style", "display: inline-block");
+            }
+        }
+
+        function OK(){
+            if(/^[1-2][0-9]{3}\-[0][1-9]\-[0-2][0-9]$/g.test(tabelaDoEdycji[7].textContent) 
+            || /^[1-2][0-9]{3}\-[0][1-9]\-[3][0-1]$/g.test(tabelaDoEdycji[7].textContent)
+            || /^[1-2][0-9]{3}\-[1][0-2]\-[0-2][0-9]$/g.test(tabelaDoEdycji[7].textContent)
+            || /^[1-2][0-9]{3}\-[1][0-2]\-[3][0-1]$/g.test(tabelaDoEdycji[7].textContent)){
+                //porownaj daty
+                var dataZwrotu = new Date(tabelaDoEdycji[7].textContent);
+                var dataWypozyczenia = new Date(tabelaDoEdycji[5].textContent);
+                var dzisiaj = new Date();
+
+                if(dataZwrotu >= dataWypozyczenia){
+                    //nie moze byc tez wieksza niz dzis 
+                    if(dataZwrotu <= dzisiaj){
+                        var xmlhttp = new XMLHttpRequest();
+                        xmlhttp.onreadystatechange = function () {
+                            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                                var valid = JSON.parse(xmlhttp.responseText).valid;
+                                if(valid){
+                                    document.location.reload();
+                                } else {
+                                    document.location.reload();
+                                    alert("Błąd przy zapisie do bazy danych");
+                                }
+                            }
+                        }
+                        xmlhttp.open("POST", "//localhost:5000/edytuj_wypozyczenie", false);
+                        xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                        xmlhttp.send(JSON.stringify({
+                                    ID: tabelaDoEdycji[0].textContent,
+                                    dataZwrotu: tabelaDoEdycji[7].textContent,
+                                    dataWypozyczenia: tabelaDoEdycji[5].textContent
+                                }));
+                    } else {
+                        alert("Data zwrotu nie może wykraczać poza dzisiejszą datę!")
+                    }
+                } else {
+                    alert("Data zwrotu nie może być mniejsza niż data wypożyczenia!")
+                }
+            } else {
+                alert("Podaj poprawną datę zwrotu w formacie YYYY-MM-DD!");
+                tabelaDoEdycji[7].setAttribute("style", "borderColor: red");
+            }
+        }
+    </script>
+<body>
+    <form>
+        <input type="submit" value="Lista klient&oacute;w" formaction="/lista_klientow" />
+        <input type="submit" value="Lista kaset" formaction="/lista_kaset">
+        <input type="submit" id ="oneDifferent" value="Wypożycz" formaction="/dodaj_wypozyczenie">
+    </form>
+    <table id="table_with_information">
+        <tbody>
+            <tr style="height: 67.6px;">
+                <th id="mainTitle" style="text-align: center;" colspan="9">Lista wypożyczeń</th>
+            </tr>
+            <tr style="height: 60px;">
+                <th style="width: 180px; height: 60px;">ID Wypożyczenia</th>
+                <th style="width: 180px; height: 60px;">ID Kasety</th>
+                <th style="width: 180px; height: 60px;">Tytuł kasety</th>
+                <th style="width: 180px; height: 60px;">IDKlient</th>
+                <th style="width: 180px; height: 60px;">Nazwisko klienta</th>
+                <th style="width: 180px; height: 60px;">Data wypożyczenia</th>
+                <th style="width: 180px; height: 60px;">Oczekiwana data zwrotu</th>
+                <th style="width: 180px; height: 60px;">Data zwrotu</th>
+                <th style="width: 180px; height: 60px;"></th>
+                {{#list data.length}}
+                    {{this}}
+                {{/list}}
+            </tr>
+        </tbody>
+    </table>
+</body>
+
+</html>

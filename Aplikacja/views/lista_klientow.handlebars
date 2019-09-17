@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Lista klientów</title>
+    <link rel='stylesheet' type='text/css' href='/stylesheets/main.css' />
+</head>
+<script>
+        function usun(numer){
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    var data = JSON.parse(xmlhttp.responseText).validate;
+                    if(data){
+                        document.location.reload();
+                    } else {
+                        alert("Nie można usunąć klienta, który wypożyczył kasetę!")
+                    }
+                }
+            }
+            xmlhttp.open("POST", "//localhost:5000/usun_klienta", false);
+            xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xmlhttp.send(JSON.stringify({
+                ID: numer
+            }));
+        }
+        var tabelaDoEdycji;
+        var numerG;
+        function edit(numer) {
+            numerG = numer;
+            tabelaDoEdycji = document.getElementsByName(numer+numer);
+            for(var i = 1 ; i < tabelaDoEdycji.length ; i++){
+                tabelaDoEdycji[i].setAttribute("contenteditable", "true");
+                if(tabelaDoEdycji[i].id=="makeColor"){
+                    tabelaDoEdycji[i].style.backgroundColor = "#ff523b";
+                }else {
+                    tabelaDoEdycji[i].style.backgroundColor = "#ff523b";
+                    tabelaDoEdycji[i].style.color = "#585858";
+                }
+            }
+            
+            var buttons = document.getElementsByName("buttons"+numer);
+            for(var i = 0 ; i < buttons.length ; i++){
+                buttons[i].setAttribute("style", "display: none");
+            }
+            
+            var buttonyWEdicie = document.getElementsByName("button"+numer+numer+numer);
+            for(var i = 0 ; i < buttonyWEdicie.length ; i++){
+                buttonyWEdicie[i].setAttribute("style", "display: inline-block");
+            }
+        }
+
+        function OK(){
+            if(/^[A-Za-z0-9]+[A-Za-z0-9\s]*$/g.test(tabelaDoEdycji[1].textContent)){
+                if(/^[A-Za-z0-9]+[A-Za-z0-9\s]*$/g.test(tabelaDoEdycji[2].textContent)){
+                    if(/^[0-9]{11}$/g.test(tabelaDoEdycji[3].textContent) || /^\s*$/g.test(tabelaDoEdycji[3].textContent)){
+                        if(/^[A-Za-z0-9]+[A-Za-z0-9\s\/\.]*$/g.test(tabelaDoEdycji[4].textContent)){
+                            if(/^[0-9]{3}\-[0-9]{3}\-[0-9]{3}$/g.test(tabelaDoEdycji[5].textContent)){
+                                var xmlhttp = new XMLHttpRequest();
+                                xmlhttp.onreadystatechange = function () {
+                                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                                        var valid = JSON.parse(xmlhttp.responseText).valid;
+                                        if(valid){
+                                            document.location.reload();
+                                        } else {
+                                            document.location.reload();
+                                            alert("Błąd przy zapisie do bazy danych");
+                                        }
+                                    }
+                                }
+                                xmlhttp.open("POST", "//localhost:5000/edytuj_klienta", false);
+                                xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                                xmlhttp.send(JSON.stringify({
+                                    ID: tabelaDoEdycji[0].textContent,
+                                    Imie: tabelaDoEdycji[1].textContent,
+                                    Nazwisko: tabelaDoEdycji[2].textContent,  
+                                    PESEL: tabelaDoEdycji[3].textContent,
+                                    Adres: tabelaDoEdycji[4].textContent,
+                                    Telefon: tabelaDoEdycji[5].textContent
+                                }));
+                            } else{
+                                alert("Podaj poprawny numer telefonu w formacie 000-000-000!");
+                                tabelaDoEdycji[5].setAttribute("style", "borderColor: red");
+                            }
+                        } else {
+                            alert("Podaj poprawny adres");
+                            tabelaDoEdycji[4].setAttribute("style", "borderColor: red");
+                        } 
+                    }else {
+                        alert("Podaj poprawny PESEL!");
+                        tabelaDoEdycji[3].setAttribute("style", "borderColor: red");
+                    }
+                }else {
+                    alert("Podaj poprawne Nazwisko (nie używaj polskich znaków)!");
+                    tabelaDoEdycji[2].setAttribute("style", "borderColor: red");
+                }
+            } else {
+                alert("Podaj poprawne imię!");
+                tabelaDoEdycji[1].setAttribute("style", "borderColor: red");
+            }
+        }
+    </script>
+<body>
+    <form >
+        <input type="submit" value="Lista wypożyczeń" formaction="/lista_wypozyczen" />
+        <input type="submit" value="Lista kaset" formaction="/lista_kaset" />
+        <input type="submit" id ="oneDifferent" value="Dodaj klienta" formaction="/dodaj_klienta" />
+    </form>
+    <table id="table_with_information" >
+        <tbody>
+            <tr style="height: 67.6px;">
+                <th id="mainTitle" style="text-align: center;" colspan="7">Lista klientów</th>
+            </tr>
+            <tr style="height: 60px;">
+                <th style="width: 180px; height: 60px;">ID Klienta</th>
+                <th style="width: 180px; height: 60px;">Imię</th>
+                <th style="width: 180px; height: 60px;">Nazwisko</th>
+                <th style="width: 180px; height: 60px;">PESEL</th>
+                <th style="width: 180px; height: 60px;">Adres</th>
+                <th style="width: 180px; height: 60px;">Telefon</th>
+                <th style="width: 180px; height: 60px;"></th>
+                {{#list data.length}}
+                    {{this}}
+                {{/list}}
+            </tr>
+        </tbody>
+    </table>
+</body>
+
+</html>

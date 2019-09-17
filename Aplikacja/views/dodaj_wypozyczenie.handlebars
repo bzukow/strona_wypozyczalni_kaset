@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Dodaj wypozyczenie</title>
+    <link rel='stylesheet' type='text/css' href='/stylesheets/formularzWyp.css' />
+</head>
+<body>
+    <script>
+        var xmlhttp = new XMLHttpRequest();
+        function show() {
+            var idKlient = document.getElementById("idklient").value;
+            var RESidKlient = idKlient.split(" ");
+            var idKaseta = document.getElementById("idkaseta").value;
+            var RESidKaseta = idKaseta.split(" ");
+            console.log(RESidKaseta[0]);
+            console.log(RESidKlient[0]);
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    var valid = JSON.parse(xmlhttp.responseText).valid;
+                    if(valid){
+                        window.location.replace("lista_wypozyczen");
+                    } else {
+                        window.location.replace("lista_wypozyczen");
+                        alert("Błąd przy zapisie do bazy danych");
+                    }
+                }
+            }
+            xmlhttp.open("POST", "//localhost:5000/lista_wypozyczen", false);
+            xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xmlhttp.send(JSON.stringify({
+                    IDKlienta: RESidKlient[0],
+                    IDKasety: RESidKaseta[0]
+                }));                
+        }
+    </script>
+     <div class="main">
+         <div class="naglowek">
+            Wypożycz
+        </div>
+        <div class="forLabels">
+            <label for="idklient">ID Klienta</label>
+            </br>
+            <label for="idkaseta">ID Kasety</label>
+            </br>
+        </div>
+        <div class="forInputs">
+                    {{#klienci data.length}}
+                        {{this}}
+                    {{/klienci}}
+            <br>
+            
+                    {{#kasety data.length}}
+                        {{this}}
+                    {{/kasety}}
+            </br>
+        </div>
+        <div class="forButtons">
+            <input id="zatwierdz" type="submit" value="Dodaj" onclick="show()" />
+            <input id="back" type="button" value="Anuluj" onclick="history.back()" />
+        </div>
+    </div>
+</body>
+</html>

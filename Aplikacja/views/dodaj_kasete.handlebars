@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Dodaj kasete</title>
+    <link rel='stylesheet' type='text/css' href='/stylesheets/formularz.css' />
+</head>
+<body>
+    <script>
+        var xmlhttp = new XMLHttpRequest();
+        function show() {
+            var dataProdukcji = new Date(document.getElementById("dataProdukcji").value);
+            var dzisiaj = new Date();
+            if(dataProdukcji < dzisiaj){
+                if(/^[0-9]{6}$/g.test(document.getElementById("numerSeryjny").value)){
+                    if(/^[A-Za-z0-9]+[A-Za-z0-9\s]*$/g.test(document.getElementById("tytul").value)){
+                        if(/^[A-Za-z0-9\s]*$/g.test(document.getElementById("rezyser").value)){
+                            xmlhttp.onreadystatechange = function () {
+                                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                                    var valid = JSON.parse(xmlhttp.responseText).valid;
+                                    if(valid){
+                                        window.location.replace("lista_kaset");
+                                    } else {
+                                        window.location.replace("lista_kaset");
+                                        alert("Błąd przy zapisie do bazy danych");
+                                    }
+                                }
+                            }
+                            xmlhttp.open("POST", "//localhost:5000/lista_kaset", false);
+                            xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                            xmlhttp.send(JSON.stringify({
+                                dataProdukcji: document.getElementById("dataProdukcji").value,
+                                numerSeryjny: document.getElementById("numerSeryjny").value,
+                                tytul: document.getElementById("tytul").value,
+                                typ: document.getElementById("typ").value,
+                                rezyser: document.getElementById("rezyser").value
+                            }));
+                        } else {
+                            alert("Jeśli nie podajesz reżysera usuń wszystie znaki z pola!");
+                            document.getElementById("rezyser").setAttribute("bordercolor", "red");
+                        }
+                    } else {
+                        alert("Podaj poprawny tytuł!");
+                        document.getElementById("tytul").setAttribute("bordercolor", "red");
+                    }
+                } else {
+                    alert("Podaj poprawny numer seryjny (6 cyfr)!");
+                    document.getElementById("numerSeryjny").setAttribute("bordercolor", "red");
+                }
+            } else {
+                alert("Nie możesz ustawić daty produkcji powyżej dnia dzisiejszego!");
+                document.getElementById("dataProdukcji").setAttribute("bordercolor", "red");
+            }        
+        }
+    </script>
+    <div class="main">
+        <div class="naglowek">
+            Dodaj kasetę
+        </div>
+        <div class="forLabels">
+            <label for="dataProdukcji">Data produkcji</label>
+            <br>
+            <label for="numerSeryjny">Numer seryjny</label>
+            <br>
+            <label for="tytul">Tytuł</label>
+            <br>
+            <label for="typ">Typ </label>
+            <br>
+            <label for="rezyser">Reżyser</label>
+            <br>
+        </div>
+        <div class="forInputs">
+            <input id="dataProdukcji" type="date" min="1980-01-01" value="1980-01-01" max="2015-01-01"/>
+            <br>
+            <input id="numerSeryjny" type="number" />
+            <br>
+            <input id="tytul" type="text" minlength="1"/>
+            <br>
+            <select id="typ" name="kontrolka">
+                <option >Dokumentalny</option>
+                <option >Komediowy</option>
+                <option >Historyczny</option>
+                <option >Horror</option>
+                <option >Obyczajowy</option>
+            </select>
+            <br>
+            <input id="rezyser" type="text" />
+            <br>
+        </div>
+        <div class="forButtons">
+            <input id="zatwierdz" type="submit" value="Dodaj" onclick="show()" />
+            <input id="back" type="button" value="Anuluj" onclick="history.back()" />
+        </div>
+    </div>
+</body>
+
+
+</html>

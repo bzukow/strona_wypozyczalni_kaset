@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Dodaj klienta</title>
+    <link rel='stylesheet' type='text/css' href='/stylesheets/formularz.css' />
+</head>
+<body>
+    <script>
+        var xmlhttp = new XMLHttpRequest();
+        function show() {
+            if(/^[A-Za-z0-9]+[A-Za-z0-9\s]*$/g.test(document.getElementById("imie").value)){
+                if(/^[A-Za-z0-9]+[A-Za-z0-9\s]*$/g.test(document.getElementById("nazwisko").value)){
+                    if(/^[0-9]{11}$/g.test(document.getElementById("PESEL").value) || /^\s*$/g.test(document.getElementById("PESEL").value)){
+                        if(/^[A-Za-z0-9]+[A-Za-z0-9\s\/\.]*$/g.test(document.getElementById("adres").value)){
+                            if(/^[0-9]{3}\-[0-9]{3}\-[0-9]{3}$/g.test(document.getElementById("telefon").value)){
+                                xmlhttp.onreadystatechange = function () {
+                                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                                        var valid = JSON.parse(xmlhttp.responseText).valid;
+                                        if(valid){
+                                            window.location.replace("lista_klientow");
+                                        } else {
+                                            window.location.replace("lista_klientow");
+                                            alert("Błąd przy zapisie do bazy danych");
+                                        }
+                                    }
+                                }
+                                xmlhttp.open("POST", "//localhost:5000/lista_klientow", false);
+                                xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                                xmlhttp.send(JSON.stringify({
+                                    Imie: document.getElementById("imie").value,
+                                    Nazwisko: document.getElementById("nazwisko").value,  
+                                    PESEL: document.getElementById("PESEL").value,
+                                    Adres: document.getElementById("adres").value,
+                                    Telefon: document.getElementById("telefon").value
+                                }));
+                            } else{
+                                alert("Podaj poprawny numer telefonu w formacie 000-000-000!");
+                            }
+                        } else{
+                            alert("Podaj poprawny adres!");
+                        }
+                    } else{
+                        alert("Podaj poprawny PESEL lub zostaw puste pole!");
+                    }
+                } else{
+                    alert("Podaj poprawne Nazwisko (nie używaj polskich znaków)!");
+                }
+            } else{
+                alert("Podaj poprawne imię!");
+                //dodac ew. obwody pól
+            }            
+        }
+    </script>
+     <div class="main">
+         <div class="naglowek">
+            Dodaj klienta
+        </div>
+        <div class="forLabels">
+            <label for="imie">Imię</label>
+            <br>
+            <label for="nazwisko">Nazwisko</label>
+            <br>
+            <label for="PESEL">PESEL</label>
+            <br>
+            <label for="adres">Adres</label>
+            <br>
+            <label for="telefon">Telefon</label>
+            <br>
+        </div>
+        <div class="forInputs">
+            <input id="imie" type="text"/>
+            <br>            
+            <input id="nazwisko" type="text" />
+            <br>            
+            <input id="PESEL" type="number" maxlength="11"/>
+            <br>           
+            <input id="adres" type="text" />
+            <br>          
+            <input id="telefon" type="text" />
+            <br>
+        </div>
+        <div class="forButtons">
+            <input id="zatwierdz" type="submit" value="Dodaj" onclick="show()" />
+            <input id="back" type="button" value="Anuluj" onclick="history.back()" />
+        </div>
+    </div>
+</body>
+</html>
